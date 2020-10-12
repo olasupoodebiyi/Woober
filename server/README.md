@@ -9,15 +9,20 @@ Server for Uber Clone with Typescript, Typegraphql and React/React Native
 - [x] Sign In / Sign Up with FaceBook
 - [x] Sign In / Sign Up with Email
 - [x] Starts Phone Number Verification
-- [] Complete Phone Number Verification
+- [x] Complete Phone Number Verification
 - [] Sign Up with Email
+
+---
+
+## Authentication:
+
+- [x] Generate JWT
+- [] Verify JWT
 
 ---
 
 ## Private Resolvers
 
-- [] Generate JWT
-- [] Verify JWT
 - [] Verify Email
 - [] Get Current User Profile
 - [] Update Current User Profile

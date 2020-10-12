@@ -8,6 +8,10 @@ import { StartPhoneVerificationResponse } from './../ResponseTypes/StartPhoneVer
 import { StartPhoneVerificationInputArgs } from '../InputTypes/StartPhoneVerification';
 import { Verification } from '../../entity/Verification';
 import { sendVerificationSMS } from "../../utils/sendSMS";
+import { CompletePhoneVerificationResponse } from './../ResponseTypes/CompletePhoneVerification';
+import { CompletePhoneVerificationInputArgs } from "../InputTypes/CompletePhoneVerification";
+import { EmailSignUpResponse } from './../ResponseTypes/EmailSignUpResponse';
+import { createJWT } from './../../utils/createJWT';
 
 
 @Resolver()
@@ -15,6 +19,40 @@ export class UserResolver {
     @Query(() => [User])
     users() {
         return User.find()
+    }
+
+    @Mutation(() => EmailSignUpResponse)
+    async emailSignUp(
+        @Arg('options') options: EmailSignInInputArgs
+    ): Promise<EmailSignUpResponse> {
+        const {email} = options;
+        try {
+            const existingUser = await User.findOne({ email })
+            if (existingUser){
+                return {
+                    ok: false,
+                    error: "You should log in instead",
+                    token: null
+                }
+            } else {
+                
+                const newUser = await User.create({...options}).save()
+                const token = createJWT(newUser.id)
+
+                return {
+                    ok: true,
+                    error: null,
+                    token
+                }
+            }
+        } catch (error) {
+            return {
+                ok: false,
+                error: error.message,
+                token: null
+            }
+            
+        }
     }
 
     @Mutation(() => EmailSignInResponse)
@@ -34,10 +72,12 @@ export class UserResolver {
 
             const checkPassword = await user.comparePassword(password);
             if (checkPassword){
+                const token = createJWT(user.id)
+
                 return {
                     ok: true,
                     error: null,
-                    token: "Coming Soon, after!"
+                    token
                 }
             } else {
                 return {
@@ -71,7 +111,6 @@ export class UserResolver {
                 payload: phoneNumber,
                 target: "PHONE"                
             }).save();
-            //TO DO send SMS
             await sendVerificationSMS(newVerification.payload, newVerification.key)
             return {
                 ok: true,
@@ -86,6 +125,64 @@ export class UserResolver {
         }
     }
 
+    @Mutation(() => CompletePhoneVerificationResponse)
+    async completePhoneVerification(
+        @Arg("options") options: CompletePhoneVerificationInputArgs
+    ): Promise<CompletePhoneVerificationResponse> {
+        const {phoneNumber, key } = options;
+
+        try {
+            const verification = await Verification.findOne({
+                payload: phoneNumber,
+                key
+            });
+            if(!verification){
+                return {
+                    ok: false,
+                    error: "Verification key is not valid",
+                    token: null
+                }
+            } else {
+                verification.verified = true;
+                verification.save();
+            }
+        } catch (error) {
+            return {
+                ok: false,
+                error: error.message,
+                token: null
+            }
+        }
+        try {
+            const user = await User.findOne({phoneNumber})
+            if (user){
+                user.verifiedPhoneNumber = true
+                user.save();
+                const token = createJWT(user.id)
+
+                return {
+                    ok: true,
+                    error: null,
+                    token
+                }
+            } else {
+                return {
+                    ok: true,
+                    error: null,
+                    token: null
+                }
+            }
+        } catch (error) {
+            return {
+                ok: false,
+                error: error.message,
+                token: null
+            }
+            
+        }
+
+    }
+
 
     @Mutation(() => FacebookConnectResponse)
     async facebookConnect(
@@ -95,10 +192,11 @@ export class UserResolver {
         try {
             const existingUser = await User.findOne({fbID})
             if (existingUser){
+                const token = createJWT(existingUser.id)
                 return {
                     ok: true,
-                    token: "Coming soon, already",
                     error: null,
+                    token
                 }
             }
         } catch (error) {
@@ -109,13 +207,15 @@ export class UserResolver {
             }
         }
         try {
-            await User.create({...options, profilePhoto: `http://graph.facebook/${fbID}/picture?type=square`}).save()
-                return {
+            const newUser = await User.create({...options, profilePhoto: `http://graph.facebook/${fbID}/picture?type=square`}).save()
+                
+            const token = createJWT(newUser.id)
+            return {
                     ok: true,
                     error: null,
-                    token: "Coming soon, created!"
-                }
-        
+                    token
+                } 
+                         
         } catch (error) {
             return {
                 ok: false,

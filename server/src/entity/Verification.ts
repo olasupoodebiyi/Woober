@@ -25,6 +25,10 @@ export class Verification extends BaseEntity{
     @Field(() => String)
     @Column({type: "text"})
     key: string
+
+    @Field(()=> Boolean)
+    @Column({type: "boolean", default: false})
+    verified: boolean
     
     @Field()
     @CreateDateColumn()
