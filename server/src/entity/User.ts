@@ -1,7 +1,11 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, ManyToOne, OneToMany} from "typeorm";
 import {IsEmail} from 'class-validator';
 import bcrypt from "bcrypt"
+import { Chat } from './Chat';
+import { Message } from './Message';
+import { Verification } from './Verification';
+import { Ride } from './Ride';
 
 const BCRYPT_ROUNDS = 10;
 
@@ -58,6 +62,20 @@ export class User extends BaseEntity {
     @Column()
     verifiedPhoneNumber: boolean;
 
+    @ManyToOne(_type => Chat, chat => chat.participants)
+    chat: Chat
+
+    @OneToMany(_type => Message, message => message.user)
+    messages: Message[]
+
+    @OneToMany(_type => Verification, verification => verification.user)
+    verifications: Verification[]
+
+    @OneToMany(_type => Ride, ride => ride.passenger)
+    ridesAsPassenger: Ride[]
+    
+    @OneToMany(_type => Ride, ride => ride.driver)
+    ridesAsDriver: Ride[]
     
     @Field(() => Boolean)
     @Column({type: "boolean", default: false})
