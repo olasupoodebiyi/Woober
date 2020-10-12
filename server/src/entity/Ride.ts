@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from "type-graphql"
 import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { rideStatus } from "types/types";
+import { rideStatus } from "src/types/types";
 import { User } from './User';
 
 @Entity()

@@ -4,7 +4,6 @@ import {IsEmail} from 'class-validator';
 import bcrypt from "bcrypt"
 import { Chat } from './Chat';
 import { Message } from './Message';
-import { Verification } from './Verification';
 import { Ride } from './Ride';
 
 const BCRYPT_ROUNDS = 10;
@@ -38,17 +37,21 @@ export class User extends BaseEntity {
     @Column()
     profilePhoto: string;
     
-    @Field(() => Int)
-    @Column({type: 'int'})
+    @Field(() => Int, {nullable: true})
+    @Column({type: 'int', nullable: true})
     age: number;
 
-    @Field(() => String)
-    @Column({type: "text"})
+    @Field(() => String, {nullable: true})
+    @Column({type: "text", nullable: true})
     phoneNumber: string
 
     @Field(() => String)
-    @Column()
+    @Column({nullable: true})
     password: string;
+    
+    @Field(()=> String)
+    @Column({nullable: true})
+    fbID: string;
     
     @Field()
     @CreateDateColumn()
@@ -58,8 +61,8 @@ export class User extends BaseEntity {
     @UpdateDateColumn()
     updatedAt: string;
     
-    @Field(() => Boolean)
-    @Column()
+    @Field(() => Boolean, {nullable: true})
+    @Column({nullable: true})
     verifiedPhoneNumber: boolean;
 
     @ManyToOne(_type => Chat, chat => chat.participants)
@@ -67,9 +70,6 @@ export class User extends BaseEntity {
 
     @OneToMany(_type => Message, message => message.user)
     messages: Message[]
-
-    @OneToMany(_type => Verification, verification => verification.user)
-    verifications: Verification[]
 
     @OneToMany(_type => Ride, ride => ride.passenger)
     ridesAsPassenger: Ride[]

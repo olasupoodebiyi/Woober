@@ -33,5 +33,5 @@
   "include": [
     "./src/**/*.tsx",
     "./src/**/*.ts"
-, "resolvers/UserResolver.ts"  ]
+, "resolvers/UserResolver.ts", "resolvers/InputTypes/StartPhoneVerification.ts"  ]
 }
