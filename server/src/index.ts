@@ -7,17 +7,28 @@ import express from 'express'
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from './resolvers/User/UserResolver';
-
+import cors from "cors";
+import logger from 'morgan'
+import helmet from 'helmet'
+import { jwt } from './middleware/jwt';
 
 const PORT: number | string = process.env.PORT || 4040;
 
 
+
 (async ()=> {
     const app = express();
+
+    app.use(cors())
+    app.use(logger("dev"))
+    app.use(helmet());
+    app.use(jwt)
+
     app.get('/', (_,res) => 
         res.send('Hello!'));
 
     await createConnection();
+
 
     const apolloServer = new ApolloServer({
     schema: await buildSchema({

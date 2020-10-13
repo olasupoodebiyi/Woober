@@ -9,6 +9,9 @@ export class EmailSignUpInputArgs{
     lastName: string
 
     @Field(()=> String)
+    password: string
+
+    @Field(()=> String)
     profilePhoto: string
 
     @Field(()=> String)

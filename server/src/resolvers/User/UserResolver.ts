@@ -12,6 +12,7 @@ import { CompletePhoneVerificationResponse } from './../ResponseTypes/CompletePh
 import { CompletePhoneVerificationInputArgs } from "../InputTypes/CompletePhoneVerification";
 import { EmailSignUpResponse } from './../ResponseTypes/EmailSignUpResponse';
 import { createJWT } from './../../utils/createJWT';
+import { EmailSignUpInputArgs } from './../InputTypes/EmailSignUp';
 
 
 @Resolver()
@@ -23,7 +24,7 @@ export class UserResolver {
 
     @Mutation(() => EmailSignUpResponse)
     async emailSignUp(
-        @Arg('options') options: EmailSignInInputArgs
+        @Arg('options') options: EmailSignUpInputArgs
     ): Promise<EmailSignUpResponse> {
         const {email} = options;
         try {
@@ -225,16 +226,5 @@ export class UserResolver {
         }
     }
 
-    
 
-    // @Mutation()
-    // async register(
-    //     @Arg('email', () => String) email: string,
-    //     @Arg('password', () => String) password: string,
-    // ) {
-    //     await User.insert({
-    //         email
-    //     })
-    // }
-    
 }
